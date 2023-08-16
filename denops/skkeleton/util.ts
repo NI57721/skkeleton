@@ -101,3 +101,11 @@ export async function readFileWithEncoding(
   const decoder = new TextDecoder(fileEncoding);
   return decoder.decode(uint);
 }
+
+export function splitSequentialKeys(
+  key: string,
+): string[] {
+  return key.split(/(?<=<[^>]+>)|(?=<[^>]+>)/).flatMap((s) =>
+    s.match(/^<[^>]+>$/) ? s : s.split("")
+  );
+}

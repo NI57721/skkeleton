@@ -11,7 +11,7 @@ import { handleKey, registerKeyMap } from "./keymap.ts";
 import { keyToNotation, notationToKey, receiveNotation } from "./notation.ts";
 import { currentContext, currentLibrary } from "./store.ts";
 import type { CompletionData, RankData, SkkServerOptions } from "./types.ts";
-import { homeExpand } from "./util.ts";
+import { homeExpand, splitSequentialKeys } from "./util.ts";
 
 type Opts = {
   key: string;
@@ -224,7 +224,9 @@ async function handle(
     if (config.debug) {
       console.log("input after complete");
     }
-    const notation = keyToNotation[notationToKey[key]];
+    const notation = splitSequentialKeys(key).map((single_key) => {
+      return keyToNotation[notationToKey[single_key]] || single_key;
+    }).join("");
     if (config.debug) {
       console.log({
         completeType,
@@ -251,7 +253,9 @@ async function handle(
   if (opts.function) {
     await functions.get()[opts.function](context, key);
   } else {
-    await handleKey(context, key);
+    for (const single_key of splitSequentialKeys(key)) {
+      await handleKey(context, single_key);
+    }
   }
   const output = context.preEdit.output(context.toString());
   if (output === "" && before !== context.mode) {
