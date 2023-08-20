@@ -14,7 +14,7 @@ import type { CompletionData, RankData, SkkServerOptions } from "./types.ts";
 import { homeExpand } from "./util.ts";
 
 type Opts = {
-  key: string;
+  key: string | string[];
   function?: string;
   expr?: boolean;
 };
@@ -40,7 +40,8 @@ type HandleResult = {
 
 // deno-lint-ignore no-explicit-any
 function isOpts(x: any): x is Opts {
-  return typeof x?.key === "string" || x?.key === "string[]";
+  const key = x?.key;
+  return typeof key === "string" || is.ArrayOf(is.String)(key);
 }
 
 function assertOpts(x: unknown): asserts x is Opts {
