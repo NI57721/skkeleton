@@ -215,7 +215,7 @@ async function handle(
   vimStatus: unknown,
 ): Promise<string> {
   assertOpts(opts);
-  const key = opts.key;
+  const keyList = is.String(opts.key) ? [opts.key] : opts.key;
   const { prevInput, completeInfo, completeType, mode } =
     vimStatus as VimStatus;
   const context = currentContext.get();
@@ -224,10 +224,9 @@ async function handle(
     if (config.debug) {
       console.log("input after complete");
     }
-    const notation = keyToNotation[notationToKey[key]];
-    // const notation = splitSequentialKeys(key).map((single_key) => {
-    //   return keyToNotation[notationToKey[single_key]] || single_key;
-    // }).join("");
+    const notation = keyList.map((key) => {
+      return keyToNotation[notationToKey[key]] || key;
+    }).join("");
     if (config.debug) {
       console.log({
         completeType,
@@ -252,12 +251,13 @@ async function handle(
   }
   const before = context.mode;
   if (opts.function) {
-    await functions.get()[opts.function](context, key);
+    for (const key of keyList) {
+      await functions.get()[opts.function](context, key);
+    }
   } else {
-    await handleKey(context, key);
-    // for (const single_key of splitSequentialKeys(key)) {
-    //   await handleKey(context, single_key);
-    // }
+    for (const key of keyList) {
+      await handleKey(context, key);
+    }
   }
   const output = context.preEdit.output(context.toString());
   if (output === "" && before !== context.mode) {
