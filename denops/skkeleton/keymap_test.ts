@@ -46,12 +46,16 @@ test({
     lib.registerCandidate("okurinasi", "われ", "我");
     lib.registerCandidate("okuriari", "おもu", "思");
 
-    await denops.cmd('call skkeleton#handle("handleKey", {"key": ["W", "a", "r", "e"]})');
+    await denops.cmd(
+      'call skkeleton#handle("handleKey", {"key": ["W", "a", "r", "e"]})',
+    );
     assertEquals(currentContext.get().toString(), "▽われ");
 
     currentContext.init().denops = denops;
 
-    await denops.cmd('call skkeleton#handle("handleKey", {"key": ["O", "m", "o", "U"]})');
+    await denops.cmd(
+      'call skkeleton#handle("handleKey", {"key": ["O", "m", "o", "U"]})',
+    );
     assertEquals(currentContext.get().toString(), "▼思う");
   },
 });
